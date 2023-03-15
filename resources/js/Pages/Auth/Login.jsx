@@ -5,38 +5,54 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
+const schema = yup.object({
+    email: yup.string().required(),
+    password: yup.string().required()
+}).required();
+
 
 export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: '',
+    // const { data, setData, post, processing, errors, reset } = useForm({
+    //     email: '',
+    //     password: '',
+    //     remember: '',
+    // });
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
+    const onSubmit = data => console.log(data);
 
-    const handleOnChange = (event) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    };
+    // useEffect(() => {
+    //     return () => {
+    //         reset('password');
+    //     };
+    // }, []);
 
-    const submit = (e) => {
-        e.preventDefault();
+    // const handleOnChange = (event) => {
+    //     setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
+    // };
 
-        post(route('login'));
-    };
+    // const submit = (e) => {
+    //     e.preventDefault();
+
+    //     post(route('login'));
+    // };
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            {/* <Head title="Log in" /> */}
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
 
-            <form onSubmit={submit}>
+
+            {/* {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>} */}
+
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
@@ -44,14 +60,13 @@ export default function Login({ status, canResetPassword }) {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
+                        {...register("email")}
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -61,18 +76,20 @@ export default function Login({ status, canResetPassword }) {
                         id="password"
                         type="password"
                         name="password"
-                        value={data.password}
+                        {...register("password")}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message} className="mt-2" />
                 </div>
 
                 <div className="block mt-4">
                     <label className="flex items-center">
-                        <Checkbox name="remember" value={data.remember} onChange={handleOnChange} />
+                        <Checkbox
+                            name="remember"
+                        // value={data.remember}
+                        />
                         <span className="ml-2 text-sm text-gray-600">Remember me</span>
                     </label>
                 </div>
@@ -87,11 +104,28 @@ export default function Login({ status, canResetPassword }) {
                         </Link>
                     )}
 
-                    <PrimaryButton className="ml-4" disabled={processing}>
+
+                    <PrimaryButton className="ml-4"
+                    // disabled={processing}
+                    >
                         Log in
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="p-6 text-center">
+
+                <>
+                    <p className="mb-2">Don't have a account ?</p>
+                    <Link
+                        to="/register"
+                        className="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                    >
+                        Register
+                    </Link>
+                </>
+
+            </div>
         </GuestLayout>
     );
 }

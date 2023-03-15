@@ -1,21 +1,48 @@
 import './bootstrap';
 import '../css/app.css';
-
+import React from "react";
 import { createRoot } from 'react-dom/client';
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { Routes, Route, Link } from 'react-router-dom';
+import Login from './Pages/Auth/Login';
+import Register from './Pages/Auth/Register';
+import { BrowserRouter } from "react-router-dom";
 
-const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx')),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
 
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+
+
+const App = () => {
+    return (
+        <>
+            <Routes>
+                <Route index element={<Login />} />
+
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
+                {/* <Route path="*" element={<NoMatch />} /> */}
+            </Routes>
+        </>
+    );
+};
+
+// const router = createBrowserRouter([
+//     {
+//         path: "/",
+//         element: <Home />,
+//     },
+//     {
+//         path: "sign-up",
+//         element: <Register />,
+//     },
+// ]);
+
+const container = document.getElementById('app');
+const root = createRoot(container); // createRoot(container!) if you use TypeScript
+root.render(
+    <React.StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </React.StrictMode>
+);

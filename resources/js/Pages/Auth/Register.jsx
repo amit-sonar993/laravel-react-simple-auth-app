@@ -4,52 +4,64 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
+
+const schema = yup.object({
+    name: yup.string().required(),
+    email: yup.string().required(),
+    password: yup.string().required(),
+    password_confirmation: yup.string()
+    .required("Confirm Password is required")
+    .oneOf([yup.ref("password")], "Passwords do not match")
+}).required();
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+    // const { data, setData, post, processing, errors, reset } = useForm({
+    //     name: '',
+    //     email: '',
+    //     password: '',
+    //     password_confirmation: '',
+    // });
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
+    // useEffect(() => {
+    //     return () => {
+    //         reset('password', 'password_confirmation');
+    //     };
+    // }, []);
 
     const handleOnChange = (event) => {
         setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
     };
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('register'));
-    };
+    const onSubmit = data => console.log(data);
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            {/* <Head title="Register" /> */}
 
-            <form onSubmit={submit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
                         id="name"
                         name="name"
-                        value={data.name}
+                        {...register("name")}
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        onChange={handleOnChange}
-                        required
+                        // onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.name?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -59,14 +71,13 @@ export default function Register() {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
+                        {...register("email")}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={handleOnChange}
-                        required
+                        // onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -76,14 +87,13 @@ export default function Register() {
                         id="password"
                         type="password"
                         name="password"
-                        value={data.password}
+                        {...register("password")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={handleOnChange}
-                        required
+                        // onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -93,25 +103,26 @@ export default function Register() {
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
-                        value={data.password_confirmation}
+                        {...register("password_confirmation")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={handleOnChange}
-                        required
+                        // onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.password_confirmation} className="mt-2" />
+                    <InputError message={errors.password_confirmation?.message} className="mt-2" />
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
                     <Link
-                        href={route('login')}
+                        // href={route('login')}
                         className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                         Already registered?
                     </Link>
 
-                    <PrimaryButton className="ml-4" disabled={processing}>
+                    <PrimaryButton className="ml-4"
+                    // disabled={processing}
+                    >
                         Register
                     </PrimaryButton>
                 </div>
