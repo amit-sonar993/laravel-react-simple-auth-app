@@ -26,7 +26,9 @@ export default function Login({ status, canResetPassword }) {
         resolver: yupResolver(schema)
     });
 
-    const onSubmit = data => console.log(data);
+    const onSubmit = data => {
+
+    }
 
     // useEffect(() => {
     //     return () => {

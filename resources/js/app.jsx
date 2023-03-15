@@ -5,6 +5,8 @@ import { createRoot } from 'react-dom/client';
 import { Routes, Route, Link } from 'react-router-dom';
 import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
+import store from './store'
+import { Provider } from 'react-redux'
 import { BrowserRouter } from "react-router-dom";
 
 
@@ -41,8 +43,10 @@ const container = document.getElementById('app');
 const root = createRoot(container); // createRoot(container!) if you use TypeScript
 root.render(
     <React.StrictMode>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+        <Provider store={store}>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </Provider>
     </React.StrictMode>
 );

@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import { useDispatch } from 'react-redux';
+import {authSubmitRegister} from '@/store/actions/auth'
 
 
 const schema = yup.object({
@@ -20,12 +22,7 @@ const schema = yup.object({
 }).required();
 
 export default function Register() {
-    // const { data, setData, post, processing, errors, reset } = useForm({
-    //     name: '',
-    //     email: '',
-    //     password: '',
-    //     password_confirmation: '',
-    // });
+    const dispatch = useDispatch()
 
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -41,7 +38,9 @@ export default function Register() {
         setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
     };
 
-    const onSubmit = data => console.log(data);
+    const onSubmit = data => {
+        dispatch(authSubmitRegister(data))
+    };
 
     return (
         <GuestLayout>
