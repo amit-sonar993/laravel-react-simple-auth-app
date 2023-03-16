@@ -25,11 +25,9 @@ const authReducer = createReducer(initialState, (builder) => {
         .addCase(authSubmitLogin.rejected, (state) => {
             state.loading = false
         })
-        .addCase(setAuthData, (state) => {
-            const authData = localStorage.getItem('auth-user')
-
-            if (authData) {
-                state.data = JSON.parse(authData)
+        .addCase(setAuthData, (state, {payload}) => {
+            if (payload) {
+                state.data = JSON.parse(payload)
             }
         })
         .addCase(authSubmitLogout.fulfilled, (state, {payload}) => {

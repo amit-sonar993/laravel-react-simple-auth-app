@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { useDispatch } from 'react-redux';
-import {authSubmitRegister} from '@/store/actions/auth'
+import { authSubmitRegister } from '@/store/actions/auth'
 
 
 const schema = yup.object({
@@ -17,29 +17,33 @@ const schema = yup.object({
     email: yup.string().required(),
     password: yup.string().required(),
     password_confirmation: yup.string()
-    .required("Confirm Password is required")
-    .oneOf([yup.ref("password")], "Passwords do not match")
+        .required("Confirm Password is required")
+        .oneOf([yup.ref("password")], "Passwords do not match")
 }).required();
 
 export default function Register() {
+    const [submitting, setSubmitting] = useState(false)
     const dispatch = useDispatch()
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
-    // useEffect(() => {
-    //     return () => {
-    //         reset('password', 'password_confirmation');
-    //     };
-    // }, []);
 
-    const handleOnChange = (event) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    };
+    const onSubmit = async (data) => {
+        setSubmitting(true)
+        const { payload } = await dispatch(authSubmitRegister(data))
+        setSubmitting(false)
 
-    const onSubmit = data => {
-        dispatch(authSubmitRegister(data))
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            let backendErrors = payload.errors
+            for (const key in backendErrors) {
+                setError(key, { message: backendErrors[key] })
+            }
+        }
+
+        console.log(payload);
     };
 
     return (
@@ -57,7 +61,6 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        // onChange={handleOnChange}
                     />
 
                     <InputError message={errors.name?.message} className="mt-2" />
@@ -73,7 +76,6 @@ export default function Register() {
                         {...register("email")}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        // onChange={handleOnChange}
                     />
 
                     <InputError message={errors.email?.message} className="mt-2" />
@@ -89,7 +91,6 @@ export default function Register() {
                         {...register("password")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        // onChange={handleOnChange}
                     />
 
                     <InputError message={errors.password?.message} className="mt-2" />
@@ -105,7 +106,6 @@ export default function Register() {
                         {...register("password_confirmation")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        // onChange={handleOnChange}
                     />
 
                     <InputError message={errors.password_confirmation?.message} className="mt-2" />
@@ -120,7 +120,7 @@ export default function Register() {
                     </Link>
 
                     <PrimaryButton className="ml-4"
-                    // disabled={processing}
+                        disabled={submitting}
                     >
                         Register
                     </PrimaryButton>

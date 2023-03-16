@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Checkbox from '@/Components/Checkbox';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { useDispatch } from 'react-redux';
-import {authSubmitLogin} from '@/store/actions/auth'
+import { authSubmitLogin } from '@/store/actions/auth'
 
 const schema = yup.object({
     email: yup.string().required(),
@@ -19,24 +19,28 @@ const schema = yup.object({
 
 
 export default function Login({ status, canResetPassword }) {
+    const [submitting, setSubmitting] = useState(false)
     const dispatch = useDispatch()
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
-    const onSubmit = data => {
-        dispatch(authSubmitLogin(data))
-        console.log(data)
+    const onSubmit = async (data) => {
+        setSubmitting(true)
+        let {payload} = await dispatch(authSubmitLogin(data))
+        setSubmitting(false)
+
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            setError('email', { message: payload.message });
+        }
     }
 
 
     return (
         <GuestLayout>
             {/* <Head title="Log in" /> */}
-
-
-
             {/* {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>} */}
 
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -93,7 +97,7 @@ export default function Login({ status, canResetPassword }) {
 
 
                     <PrimaryButton className="ml-4"
-                    // disabled={processing}
+                        disabled={submitting}
                     >
                         Log in
                     </PrimaryButton>

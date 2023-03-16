@@ -75,7 +75,7 @@ export default function Authenticated({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link to={'profile.edit'}>Profile</Dropdown.Link>
+                                        <Dropdown.Link to={'/profile'}>Profile</Dropdown.Link>
                                         <Dropdown.Link onClick={(event) => { handleLogout(event) }} method="post" as="button">
                                             Log Out
                                         </Dropdown.Link>

@@ -5,36 +5,36 @@ import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+import { Transition } from '@headlessui/react';
+import { useDispatch } from 'react-redux';
+import { profileSubmitDelete } from '@/store/actions/profile'
 
+const schema = yup.object({
+    password: yup.string().required()
+}).required();
 export default function DeleteUserForm({ className }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
+    const [submitting, setSubmitting] = useState(false)
     const passwordInput = useRef();
+    const dispatch = useDispatch()
 
-    const {
-        data,
-        setData,
-        delete: destroy,
-        processing,
-        reset,
-        errors,
-    } = useForm({
-        password: '',
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+        resolver: yupResolver(schema)
     });
 
     const confirmUserDeletion = () => {
         setConfirmingUserDeletion(true);
     };
 
-    const deleteUser = (e) => {
-        e.preventDefault();
+    const deleteUser = async (data) => {
+        setSubmitting(true)
 
-        destroy(route('profile.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current.focus(),
-            onFinish: () => reset(),
-        });
+        await dispatch(profileSubmitDelete(data))
+
+        setSubmitting(false)
     };
 
     const closeModal = () => {
@@ -57,7 +57,7 @@ export default function DeleteUserForm({ className }) {
             <DangerButton onClick={confirmUserDeletion}>Delete Account</DangerButton>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
+                <form onSubmit={handleSubmit(deleteUser)} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900">
                         Are you sure you want to delete your account?
                     </h2>
@@ -75,20 +75,22 @@ export default function DeleteUserForm({ className }) {
                             type="password"
                             name="password"
                             ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
+                            {...register("password")}
                             className="mt-1 block w-3/4"
                             isFocused
                             placeholder="Password"
                         />
 
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError message={errors.password?.message} className="mt-2" />
                     </div>
 
                     <div className="mt-6 flex justify-end">
                         <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
 
-                        <DangerButton className="ml-3" disabled={processing}>
+                        <DangerButton
+                            className="ml-3"
+                            disabled={submitting}
+                        >
                             Delete Account
                         </DangerButton>
                     </div>
