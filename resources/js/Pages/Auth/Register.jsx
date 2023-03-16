@@ -10,7 +10,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { useDispatch } from 'react-redux';
 import { authSubmitRegister } from '@/store/actions/auth'
-
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
     name: yup.string().required(),
@@ -24,6 +25,7 @@ const schema = yup.object({
 export default function Register() {
     const [submitting, setSubmitting] = useState(false)
     const dispatch = useDispatch()
+    let navigate = useNavigate();
 
     const { register, setError, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
@@ -43,7 +45,13 @@ export default function Register() {
             }
         }
 
-        console.log(payload);
+        if (payload.success) {
+            toast.success("User Registered Successfully !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+
+            return navigate("/login");
+        }
     };
 
     return (

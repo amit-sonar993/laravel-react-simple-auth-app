@@ -11,6 +11,8 @@ import { BrowserRouter } from "react-router-dom";
 import { setAuthData } from './store/actions/auth';
 import Dashboard from './Pages/Dashboard';
 import Edit from '@/Pages/Profile/Edit'
+import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -45,6 +47,7 @@ root.render(
         <Provider store={store}>
             <BrowserRouter>
                 <App />
+                <ToastContainer />
             </BrowserRouter>
         </Provider>
     </React.StrictMode>
