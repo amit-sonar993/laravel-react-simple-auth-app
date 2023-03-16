@@ -21,7 +21,7 @@ export default function DeleteUserForm({ className }) {
     const passwordInput = useRef();
     const dispatch = useDispatch()
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    const { register, setError, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(schema)
     });
 
@@ -31,10 +31,16 @@ export default function DeleteUserForm({ className }) {
 
     const deleteUser = async (data) => {
         setSubmitting(true)
-
-        await dispatch(profileSubmitDelete(data))
-
+        const { payload } = await dispatch(profileSubmitDelete(data))
         setSubmitting(false)
+
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            let backendErrors = payload.errors
+            for (const key in backendErrors) {
+                setError(key, { message: backendErrors[key] })
+            }
+        }
     };
 
     const closeModal = () => {
