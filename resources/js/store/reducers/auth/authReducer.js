@@ -2,19 +2,13 @@ import { createReducer, createAction, current } from '@reduxjs/toolkit'
 import { authSubmitLogin, setAuthData, authSubmitLogout } from '@/store/actions/auth'
 
 const initialState = {
-    loading: false,
     data: []
 }
 
 const authReducer = createReducer(initialState, (builder) => {
     builder
-        .addCase(authSubmitLogin.pending, (state, action) => {
-            state.loading = true
-            console.log(action);
-        })
         .addCase(authSubmitLogin.fulfilled, (state, { payload }) => {
             state.loading = false
-
 
             if (payload && payload.success) {
                 let payloadData = payload.data
@@ -22,12 +16,13 @@ const authReducer = createReducer(initialState, (builder) => {
                 localStorage.setItem('auth-user', JSON.stringify(payloadData))
             }
         })
-        .addCase(authSubmitLogin.rejected, (state) => {
-            state.loading = false
-        })
         .addCase(setAuthData, (state, {payload}) => {
+            console.log(payload)
             if (payload) {
                 state.data = JSON.parse(payload)
+            } else {
+                localStorage.removeItem('auth-user')
+                state.data = []
             }
         })
         .addCase(authSubmitLogout.fulfilled, (state, {payload}) => {

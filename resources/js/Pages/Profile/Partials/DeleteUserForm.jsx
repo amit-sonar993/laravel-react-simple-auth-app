@@ -11,6 +11,8 @@ import * as yup from "yup";
 import { Transition } from '@headlessui/react';
 import { useDispatch } from 'react-redux';
 import { profileSubmitDelete } from '@/store/actions/profile'
+import { toast } from 'react-toastify';
+import { setAuthData } from '@/store/actions/auth';
 
 const schema = yup.object({
     password: yup.string().required()
@@ -40,6 +42,15 @@ export default function DeleteUserForm({ className }) {
             for (const key in backendErrors) {
                 setError(key, { message: backendErrors[key] })
             }
+        }
+
+        if (payload.success) {
+            reset()
+            toast.success("Account deleted Successfully !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+
+            dispatch(setAuthData(null))
         }
     };
 
