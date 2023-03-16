@@ -12,7 +12,7 @@ const authSubmitLogin = createAsyncThunk('auth/submitLogin', async (data) => {
 
 const authSubmitLogout = createAsyncThunk('auth/submitLogout', async () => {
   try {
-    const response = await axios.get('/logout')
+    const response = await axios.post('/logout')
       return response.data
   } catch (error) {
     return error && error.response?.data

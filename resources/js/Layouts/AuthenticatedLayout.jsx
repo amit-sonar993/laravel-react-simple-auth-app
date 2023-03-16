@@ -1,14 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { authSubmitLogout } from '@/store/actions/auth';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function Authenticated({ header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const auth = useSelector((state) => state.auth.data)
+    const dispatch = useDispatch()
+    const location = useLocation();
+    const navigate = useNavigate();
+
+
+    /* Redirect when user is not authenticated */
+    useEffect(() => {
+        if (!auth.hasOwnProperty('token')) {
+            let from = "/login";
+            navigate(from, { replace: true });
+        }
+    }, [auth])
+
+    const handleLogout = (event) => {
+        event.preventDefault()
+        dispatch(authSubmitLogout())
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -38,7 +56,7 @@ export default function Authenticated({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
                                             >
-                                                {auth.user.name}
+                                                {auth.user?.name}
 
                                                 <svg
                                                     className="ml-2 -mr-0.5 h-4 w-4"
@@ -58,7 +76,7 @@ export default function Authenticated({ header, children }) {
 
                                     <Dropdown.Content>
                                         <Dropdown.Link to={'profile.edit'}>Profile</Dropdown.Link>
-                                        <Dropdown.Link to={'logout'} method="post" as="button">
+                                        <Dropdown.Link onClick={(event) => { handleLogout(event) }} method="post" as="button">
                                             Log Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
@@ -102,9 +120,9 @@ export default function Authenticated({ header, children }) {
                     <div className="pt-4 pb-1 border-t border-gray-200">
                         <div className="px-4">
                             <div className="font-medium text-base text-gray-800">
-                                {auth.user.name}
+                                {auth.user?.name}
                             </div>
-                            <div className="font-medium text-sm text-gray-500">{auth.user.email}</div>
+                            <div className="font-medium text-sm text-gray-500">{auth.user?.email}</div>
                         </div>
 
                         <div className="mt-3 space-y-1">
