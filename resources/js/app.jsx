@@ -1,19 +1,27 @@
 import './bootstrap';
 import '../css/app.css';
-import React from "react";
+import React, { useEffect } from "react";
 import { createRoot } from 'react-dom/client';
 import { Routes, Route, Link } from 'react-router-dom';
 import Login from './Pages/Auth/Login';
 import Register from './Pages/Auth/Register';
 import store from './store'
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 import { BrowserRouter } from "react-router-dom";
+import { setAuthData } from './store/actions/auth';
+import Dashboard from './Pages/Dashboard';
 
 
 
 
 
 const App = () => {
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(setAuthData())
+    },[])
+
     return (
         <>
             <Routes>
@@ -21,6 +29,7 @@ const App = () => {
 
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<Dashboard />} />
 
                 {/* <Route path="*" element={<NoMatch />} /> */}
             </Routes>

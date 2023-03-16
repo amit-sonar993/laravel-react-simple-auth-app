@@ -3,10 +3,12 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-export default function Authenticated({ auth, header, children }) {
+export default function Authenticated({ header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const auth = useSelector((state) => state.auth.data)
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -21,7 +23,7 @@ export default function Authenticated({ auth, header, children }) {
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                <NavLink to='/dashboard' active={'dashboard'}>
                                     Dashboard
                                 </NavLink>
                             </div>
@@ -55,8 +57,8 @@ export default function Authenticated({ auth, header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
+                                        <Dropdown.Link to={'profile.edit'}>Profile</Dropdown.Link>
+                                        <Dropdown.Link to={'logout'} method="post" as="button">
                                             Log Out
                                         </Dropdown.Link>
                                     </Dropdown.Content>
@@ -92,7 +94,7 @@ export default function Authenticated({ auth, header, children }) {
 
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
+                        <ResponsiveNavLink to={'dashboard'} active={'dashboard'}>
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
@@ -106,8 +108,8 @@ export default function Authenticated({ auth, header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
+                            <ResponsiveNavLink href={'profile.edit'}>Profile</ResponsiveNavLink>
+                            <ResponsiveNavLink method="post" href={'logout'} as="button">
                                 Log Out
                             </ResponsiveNavLink>
                         </div>

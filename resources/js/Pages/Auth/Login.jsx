@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import { useDispatch } from 'react-redux';
+import {authSubmitLogin} from '@/store/actions/auth'
 
 const schema = yup.object({
     email: yup.string().required(),
@@ -17,34 +19,17 @@ const schema = yup.object({
 
 
 export default function Login({ status, canResetPassword }) {
-    // const { data, setData, post, processing, errors, reset } = useForm({
-    //     email: '',
-    //     password: '',
-    //     remember: '',
-    // });
+    const dispatch = useDispatch()
+
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schema)
     });
 
     const onSubmit = data => {
-
+        dispatch(authSubmitLogin(data))
+        console.log(data)
     }
 
-    // useEffect(() => {
-    //     return () => {
-    //         reset('password');
-    //     };
-    // }, []);
-
-    // const handleOnChange = (event) => {
-    //     setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    // };
-
-    // const submit = (e) => {
-    //     e.preventDefault();
-
-    //     post(route('login'));
-    // };
 
     return (
         <GuestLayout>
@@ -86,15 +71,15 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.password?.message} className="mt-2" />
                 </div>
 
-                <div className="block mt-4">
+                {/* <div className="block mt-4">
                     <label className="flex items-center">
                         <Checkbox
                             name="remember"
-                        // value={data.remember}
+                            {...register("remember")}
                         />
                         <span className="ml-2 text-sm text-gray-600">Remember me</span>
                     </label>
-                </div>
+                </div> */}
 
                 <div className="flex items-center justify-end mt-4">
                     {canResetPassword && (

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createAction } from '@reduxjs/toolkit'
 import axios from '../../axios-client'
 
 const authSubmitLogin = createAsyncThunk('auth/submitLogin', async (data) => {
@@ -7,7 +7,7 @@ const authSubmitLogin = createAsyncThunk('auth/submitLogin', async (data) => {
       return response.data
   } catch (error) {
     return error && error.response?.data
-  } 
+  }
 })
 
 const authSubmitLogout = createAsyncThunk('auth/submitLogout', async () => {
@@ -16,7 +16,7 @@ const authSubmitLogout = createAsyncThunk('auth/submitLogout', async () => {
       return response.data
   } catch (error) {
     return error && error.response?.data
-  } 
+  }
 })
 
 const authSubmitRegister = createAsyncThunk('auth/submitRegister', async (data) => {
@@ -25,7 +25,7 @@ const authSubmitRegister = createAsyncThunk('auth/submitRegister', async (data) 
       return response.data
   } catch (error) {
     return error && error.response?.data
-  } 
+  }
 })
 
 const authSubmitVerifyEmail = createAsyncThunk('auth/SubmitVerifyEmail', async ({token}) => {
@@ -34,7 +34,7 @@ const authSubmitVerifyEmail = createAsyncThunk('auth/SubmitVerifyEmail', async (
       return response.data
   } catch (error) {
     return error && error.response?.data
-  } 
+  }
 })
 
 const authSubmitPwdResetRequest = createAsyncThunk('auth/submitPwdResetRequest', async (email) => {
@@ -43,10 +43,12 @@ const authSubmitPwdResetRequest = createAsyncThunk('auth/submitPwdResetRequest',
   //     return response.data
   // } catch (error) {
   //   return error && error.response?.data
-  // } 
+  // }
 })
 
+const setAuthData = createAction('auth/setData')
 
 
-export { authSubmitLogout, authSubmitRegister, authSubmitLogin, authSubmitVerifyEmail }
+
+export { authSubmitLogout, authSubmitRegister, authSubmitLogin, authSubmitVerifyEmail, setAuthData }
 
