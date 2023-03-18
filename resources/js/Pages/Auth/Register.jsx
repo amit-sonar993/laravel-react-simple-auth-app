@@ -1,55 +1,77 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+import { useDispatch } from 'react-redux';
+import { authSubmitRegister } from '@/store/actions/auth'
+import { toast } from 'react-toastify';
+import { useNavigate } from "react-router-dom";
+
+const schema = yup.object({
+    name: yup.string().required(),
+    email: yup.string().required(),
+    password: yup.string().required(),
+    password_confirmation: yup.string()
+        .required("Confirm Password is required")
+        .oneOf([yup.ref("password")], "Passwords do not match")
+}).required();
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+    const [submitting, setSubmitting] = useState(false)
+    const dispatch = useDispatch()
+    let navigate = useNavigate();
+
+    const { register, setError, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
 
-    const handleOnChange = (event) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    };
+    const onSubmit = async (data) => {
+        setSubmitting(true)
+        const { payload } = await dispatch(authSubmitRegister(data))
+        setSubmitting(false)
 
-    const submit = (e) => {
-        e.preventDefault();
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            let backendErrors = payload.errors
+            for (const key in backendErrors) {
+                setError(key, { message: backendErrors[key] })
+            }
+        }
 
-        post(route('register'));
+        if (payload.success) {
+            toast.success("User Registered Successfully !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+
+            return navigate("/login");
+        }
     };
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            {/* <Head title="Register" /> */}
 
-            <form onSubmit={submit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
                         id="name"
                         name="name"
-                        value={data.name}
+                        {...register("name")}
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        onChange={handleOnChange}
-                        required
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.name?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -59,14 +81,12 @@ export default function Register() {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
+                        {...register("email")}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={handleOnChange}
-                        required
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -76,14 +96,12 @@ export default function Register() {
                         id="password"
                         type="password"
                         name="password"
-                        value={data.password}
+                        {...register("password")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={handleOnChange}
-                        required
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -93,25 +111,25 @@ export default function Register() {
                         id="password_confirmation"
                         type="password"
                         name="password_confirmation"
-                        value={data.password_confirmation}
+                        {...register("password_confirmation")}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={handleOnChange}
-                        required
                     />
 
-                    <InputError message={errors.password_confirmation} className="mt-2" />
+                    <InputError message={errors.password_confirmation?.message} className="mt-2" />
                 </div>
 
                 <div className="flex items-center justify-end mt-4">
                     <Link
-                        href={route('login')}
+                        to="/login"
                         className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                         Already registered?
                     </Link>
 
-                    <PrimaryButton className="ml-4" disabled={processing}>
+                    <PrimaryButton className="ml-4"
+                        disabled={submitting}
+                    >
                         Register
                     </PrimaryButton>
                 </div>

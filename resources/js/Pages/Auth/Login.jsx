@@ -1,42 +1,49 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Checkbox from '@/Components/Checkbox';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+import { useDispatch } from 'react-redux';
+import { authSubmitLogin } from '@/store/actions/auth'
+
+const schema = yup.object({
+    email: yup.string().required(),
+    password: yup.string().required()
+}).required();
+
 
 export default function Login({ status, canResetPassword }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: '',
+    const [submitting, setSubmitting] = useState(false)
+    const dispatch = useDispatch()
+
+    const { register, setError, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
+    const onSubmit = async (data) => {
+        setSubmitting(true)
+        let {payload} = await dispatch(authSubmitLogin(data))
+        setSubmitting(false)
 
-    const handleOnChange = (event) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    };
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            setError('email', { message: payload.message });
+        }
+    }
 
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('login'));
-    };
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            {/* <Head title="Log in" /> */}
+            {/* {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>} */}
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
-
-            <form onSubmit={submit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 
@@ -44,14 +51,13 @@ export default function Login({ status, canResetPassword }) {
                         id="email"
                         type="email"
                         name="email"
-                        value={data.email}
+                        {...register("email")}
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email?.message} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
@@ -61,21 +67,23 @@ export default function Login({ status, canResetPassword }) {
                         id="password"
                         type="password"
                         name="password"
-                        value={data.password}
+                        {...register("password")}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={handleOnChange}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password?.message} className="mt-2" />
                 </div>
 
-                <div className="block mt-4">
+                {/* <div className="block mt-4">
                     <label className="flex items-center">
-                        <Checkbox name="remember" value={data.remember} onChange={handleOnChange} />
+                        <Checkbox
+                            name="remember"
+                            {...register("remember")}
+                        />
                         <span className="ml-2 text-sm text-gray-600">Remember me</span>
                     </label>
-                </div>
+                </div> */}
 
                 <div className="flex items-center justify-end mt-4">
                     {canResetPassword && (
@@ -87,11 +95,28 @@ export default function Login({ status, canResetPassword }) {
                         </Link>
                     )}
 
-                    <PrimaryButton className="ml-4" disabled={processing}>
+
+                    <PrimaryButton className="ml-4"
+                        disabled={submitting}
+                    >
                         Log in
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="p-6 text-center">
+
+                <>
+                    <p className="mb-2">Don't have a account ?</p>
+                    <Link
+                        to="/register"
+                        className="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+                    >
+                        Register
+                    </Link>
+                </>
+
+            </div>
         </GuestLayout>
     );
 }

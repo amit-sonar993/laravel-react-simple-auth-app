@@ -2,21 +2,26 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { Transition } from '@headlessui/react';
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status, className }) {
-    const user = usePage().props.auth.user;
+    // const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
-        name: user.name,
-        email: user.email,
-    });
+    // const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+    //     name: user.name,
+    //     email: user.email,
+    // });
+    const { register, handleSubmit, formState: { errors } } = useForm();
+
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        // patch(route('profile.update'));
     };
 
     return (
@@ -36,8 +41,8 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
+                        // value={data.name}
+                        // onChange={(e) => setData('name', e.target.value)}
                         required
                         isFocused
                         autoComplete="name"
@@ -53,8 +58,8 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        // value={data.email}
+                        // onChange={(e) => setData('email', e.target.value)}
                         required
                         autoComplete="username"
                     />
@@ -85,10 +90,10 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                 )}
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton >Save</PrimaryButton>
 
                     <Transition
-                        show={recentlySuccessful}
+                        show={true}
                         enterFrom="opacity-0"
                         leaveTo="opacity-0"
                         className="transition ease-in-out"

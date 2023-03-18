@@ -1,8 +1,23 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import { useSelector } from 'react-redux';
+import { useEffect, useLayoutEffect, useReducer, useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export default function Guest({ children }) {
+    const auth = useSelector((state) => state.auth.data)
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (auth.hasOwnProperty('token')) {
+            console.log('auth', location)
+            let from = location.state?.from?.pathname || "/dashboard";
+            navigate(from, { replace: true });
+        }
+    }, [auth])
+
     return (
+        (!auth.hasOwnProperty('token')) ?
         <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <Link href="/">
@@ -14,5 +29,6 @@ export default function Guest({ children }) {
                 {children}
             </div>
         </div>
+        : ''
     );
 }
