@@ -29,25 +29,6 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's password.
-     */
-    public function passwordUpdate(Request $request): JsonResponse
-    {
-        $request->validate([
-            'current_password' => ['required', 'current_password:api'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $request->user()->fill(['password' => Hash::make($request->password)]);
-
-        $request->user()->save();
-
-        return response()->json([
-            'success' => true
-        ]);
-    }
-
-    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): JsonResponse

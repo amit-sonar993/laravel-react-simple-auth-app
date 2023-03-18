@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
     name: yup.string().required(),
-    email: yup.string().required(),
+    email: yup.string().required().email(),
     password: yup.string().required(),
     password_confirmation: yup.string()
         .required("Confirm Password is required")

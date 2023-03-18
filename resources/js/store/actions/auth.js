@@ -28,27 +28,8 @@ const authSubmitRegister = createAsyncThunk('auth/submitRegister', async (data) 
   }
 })
 
-const authSubmitVerifyEmail = createAsyncThunk('auth/SubmitVerifyEmail', async ({token}) => {
-  try {
-    const response = await axios.post(`/customer/verify/${token}`)
-      return response.data
-  } catch (error) {
-    return error && error.response?.data
-  }
-})
-
-const authSubmitPwdResetRequest = createAsyncThunk('auth/submitPwdResetRequest', async (email) => {
-  // try {
-  //   const response = await axios.post(`/customer/verify/${token}`)
-  //     return response.data
-  // } catch (error) {
-  //   return error && error.response?.data
-  // }
-})
-
 const setAuthData = createAction('auth/setData')
 
 
-
-export { authSubmitLogout, authSubmitRegister, authSubmitLogin, authSubmitVerifyEmail, setAuthData }
+export { authSubmitLogout, authSubmitRegister, authSubmitLogin, setAuthData }
 

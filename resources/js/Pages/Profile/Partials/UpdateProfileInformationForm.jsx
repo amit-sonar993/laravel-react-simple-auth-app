@@ -3,25 +3,51 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Link } from 'react-router-dom';
-import { Transition } from '@headlessui/react';
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { profileSubmitUpadate } from '@/store/actions/profile'
+import { toast } from 'react-toastify';
 
-export default function UpdateProfileInformation({ mustVerifyEmail, status, className }) {
-    // const user = usePage().props.auth.user;
+const schema = yup.object({
+    name: yup.string().required(),
+    email: yup.string().required().email()
+}).required();
 
-    // const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
-    //     name: user.name,
-    //     email: user.email,
-    // });
-    const { register, handleSubmit, formState: { errors } } = useForm();
+export default function UpdateProfileInformation({ className }) {
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const auth = useSelector((state) => state.auth.data)
+    const { register, setError, handleSubmit, formState: { errors }, reset } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            name: auth.user?.name,
+            email: auth.user?.email
+        }
+    })
+    const dispatch = useDispatch()
 
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = async (data) => {
+        setIsSubmitting(true)
+        const { payload } = await dispatch(profileSubmitUpadate(data))
+        setIsSubmitting(false)
 
-        // patch(route('profile.update'));
+        /* setting backend errors */
+        if (payload.hasOwnProperty('errors')) {
+            let backendErrors = payload.errors
+            for (const key in backendErrors) {
+                setError(key, { message: backendErrors[key] })
+            }
+        }
+
+        if (payload.success) {
+            reset()
+            toast.success("Profile updated Successfully !", {
+                position: toast.POSITION.TOP_RIGHT
+            });
+        }
     };
 
     return (
@@ -34,21 +60,19 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
+            <form onSubmit={handleSubmit(submit)} className="mt-6 space-y-6">
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
 
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
-                        // value={data.name}
-                        // onChange={(e) => setData('name', e.target.value)}
-                        required
                         isFocused
                         autoComplete="name"
+                        {...register('name')}
                     />
 
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors.name?.message} />
                 </div>
 
                 <div>
@@ -58,48 +82,15 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
-                        // value={data.email}
-                        // onChange={(e) => setData('email', e.target.value)}
-                        required
                         autoComplete="username"
+                        {...register('email')}
                     />
 
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-2" message={errors.email?.message} />
                 </div>
 
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="text-sm mt-2 text-gray-800">
-                            Your email address is unverified.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
-                        </p>
-
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 font-medium text-sm text-green-600">
-                                A new verification link has been sent to your email address.
-                            </div>
-                        )}
-                    </div>
-                )}
-
                 <div className="flex items-center gap-4">
-                    <PrimaryButton >Save</PrimaryButton>
-
-                    <Transition
-                        show={true}
-                        enterFrom="opacity-0"
-                        leaveTo="opacity-0"
-                        className="transition ease-in-out"
-                    >
-                        <p className="text-sm text-gray-600">Saved.</p>
-                    </Transition>
+                    <PrimaryButton disabled={isSubmitting}>Save</PrimaryButton>
                 </div>
             </form>
         </section>

@@ -17,7 +17,6 @@ const authReducer = createReducer(initialState, (builder) => {
             }
         })
         .addCase(setAuthData, (state, {payload}) => {
-            console.log(payload)
             if (payload) {
                 state.data = JSON.parse(payload)
             } else {

@@ -10,7 +10,6 @@ export default function Guest({ children }) {
 
     useEffect(() => {
         if (auth.hasOwnProperty('token')) {
-            console.log('auth', location)
             let from = location.state?.from?.pathname || "/dashboard";
             navigate(from, { replace: true });
         }

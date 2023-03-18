@@ -13,7 +13,7 @@ import { useDispatch } from 'react-redux';
 import { authSubmitLogin } from '@/store/actions/auth'
 
 const schema = yup.object({
-    email: yup.string().required(),
+    email: yup.string().required().email(),
     password: yup.string().required()
 }).required();
 
