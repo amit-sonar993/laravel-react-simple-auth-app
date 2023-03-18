@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
-class AuthenticatedSessionController extends Controller
+class AuthenticatedUserController extends Controller
 {
 
     /**
@@ -25,7 +26,7 @@ class AuthenticatedSessionController extends Controller
                 'token' => $token,
                 'user' => $authUser
             ]
-        ]);
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -33,13 +34,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request)
     {
-
         $token = $request->user()->token();
         $token->revoke();
         $response = [
             'success' => true,
             'message' => 'You have been successfully logged out!'
         ];
-        return response($response, 200);
+
+        return response()->json($response, Response::HTTP_OK);
     }
 }

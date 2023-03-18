@@ -6,6 +6,7 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rules;
 
 class ProfileController extends Controller
@@ -25,7 +26,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'success' => true
-        ]);
+        ], Response::HTTP_OK);
     }
 
     /**
